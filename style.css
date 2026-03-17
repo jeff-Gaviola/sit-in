@@ -1,0 +1,64 @@
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background-color: #fff; color: #333; }
+
+
+.navbar { background-color: #00428d; color: white; padding: 12px 0; }
+.nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.nav-links { list-style: none; display: flex; gap: 15px; }
+.nav-links a { color: white; text-decoration: none; font-size: 0.9rem; }
+
+
+.main-container { display: flex; flex: 1; align-items: center; justify-content: center; max-width: 1100px; margin: 50px auto; }
+.logo-side { flex: 1.2; display: flex; justify-content: center; padding-right: 50px; }
+.ccs-logo { width: 100%; max-width: 450px; height: auto; }
+.form-side { flex: 1; padding-left: 50px; }
+.login-box { width: 100%; max-width: 360px; }
+
+
+.signup-container { background-color: white; width: 90%; max-width: 900px; margin: 20px auto; padding: 40px; position: relative; border: 1px solid #eee; }
+.content-wrapper { display: flex; gap: 50px; margin-top: 40px; }
+.btn-back { position: absolute; top: 20px; left: 20px; background-color: #dc3545; color: white; text-decoration: none; padding: 8px 15px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+.image-side { flex: 1; display: flex; align-items: center; justify-content: center; }
+.image-side img { width: 100%; max-width: 400px; }
+
+
+.input-group { margin-bottom: 20px; }
+.input-group input { width: 100%; max-width: 320px; padding: 12px; border: 1px solid #ced4da; border-radius: 5px; font-size: 1rem; }
+.input-group label { display: block; margin-top: 5px; font-size: 0.85rem; color: #555; }
+
+.btn-login, .btn-register { 
+    background-color: #007bff; color: white; border: none; padding: 12px 30px; 
+    border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; max-width: 320px;
+}
+.btn-login:hover, .btn-register:hover { background-color: #0069d9; }
+
+.register-text { margin-top: 20px; font-size: 0.9rem; font-weight: bold; }
+.register-text a { color: #dc3545; text-decoration: none; }
+
+
+.input-group input, 
+.input-group select {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: white; 
+    appearance: none;        
+    -webkit-appearance: none;
+}
+
+
+.input-group select {
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg%20xmlns%3D"http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg"%20width%3D"24"%20height%3D"24"%20viewBox%3D"0%200%2024%2024"><path%20fill%3D"grey"%20d%3D"M7%2010l5%205%205-5z"%2F><%2Fsvg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+}
+
+
+
+
