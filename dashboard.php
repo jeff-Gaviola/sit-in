@@ -4,13 +4,11 @@ if (!isset($_SESSION['user'])) {
     header('Location: index.php');
     exit;
 }
-// Refresh user data from DB
 require 'db.php';
 $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
 $stmt->execute([$_SESSION['user']['id']]);
 $user = $stmt->fetch();
 $_SESSION['user'] = $user;
-
 $yr_map = ['1'=>'1st Year','2'=>'2nd Year','3'=>'3rd Year','4'=>'4th Year'];
 ?>
 <!DOCTYPE html>
@@ -22,41 +20,162 @@ $yr_map = ['1'=>'1st Year','2'=>'2nd Year','3'=>'3rd Year','4'=>'4th Year'];
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-    --purple:    #4B2882;
-    --purple-dk: #311a5e;
-    --gold:      #D4A017;
-    --danger:    #c0392b;
-    --light:     #f4f1fb;
-    --muted:     #888;
+    --neon:   #00d4ff;
+    --dark:   #020b18;
+    --dark2:  #051528;
+    --muted:  #7a9bb5;
+    --border: #0d3a5c;
+    --danger: #c0392b;
+    --gold:   #D4A017;
 }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--light); min-height: 100vh; display: flex; flex-direction: column; }
-nav { background: var(--purple); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 48px; box-shadow: 0 2px 8px rgba(0,0,0,.25); position: sticky; top: 0; z-index: 99; }
-nav .brand { font-size: .85rem; font-weight: 600; color: #fff; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image:
+        linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0;
+    pointer-events: none;
+}
+nav {
+    background: rgba(2,11,24,.92);
+    border-bottom: 1px solid rgba(0,212,255,.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 48px;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    backdrop-filter: blur(8px);
+}
+nav .brand { font-size: .85rem; font-weight: 600; color: var(--neon); letter-spacing: .5px; }
 nav ul { list-style: none; display: flex; gap: 1.2rem; }
-nav ul li a { color: rgba(255,255,255,.82); text-decoration: none; font-size: .82rem; transition: color .2s; }
-nav ul li a:hover { color: var(--gold); }
-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1rem; }
-.dash-card { background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(75,40,130,.18); padding: 2.5rem 3rem; max-width: 680px; width: 100%; text-align: center; animation: fadeUp .4s ease both; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.avatar { width: 70px; height: 70px; background: var(--purple); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; }
-h2 { font-size: 1.4rem; font-weight: 600; color: var(--purple); margin-bottom: .4rem; }
+nav ul li a { color: rgba(255,255,255,.6); text-decoration: none; font-size: .82rem; transition: color .2s; }
+nav ul li a:hover, nav ul li a.active { color: var(--neon); }
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+.dash-card {
+    background: rgba(5,21,40,.85);
+    border: 1px solid rgba(0,212,255,.25);
+    border-radius: 16px;
+    padding: 2.5rem 3rem;
+    max-width: 680px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    animation: fadeUp .4s ease both;
+    box-shadow: 0 0 40px rgba(0,212,255,.08);
+}
+.dash-card::before,
+.dash-card::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border-color: var(--neon);
+    border-style: solid;
+    opacity: .7;
+}
+.dash-card::before { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+.dash-card::after  { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.avatar {
+    width: 70px; height: 70px;
+    background: rgba(0,212,255,.1);
+    border: 2px solid rgba(0,212,255,.4);
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0,212,255,.2);
+}
+h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--neon);
+    margin-bottom: .4rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 20px rgba(0,212,255,.5);
+}
 .sub { font-size: .85rem; color: var(--muted); margin-bottom: 1.5rem; }
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem 1.5rem; text-align: left; margin-bottom: 2rem; border-top: 1px solid #eee; padding-top: 1.2rem; }
-.info-item label { font-size: .72rem; color: var(--muted); display: block; }
-.info-item span { font-size: .92rem; font-weight: 600; color: #333; }
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem 1.5rem;
+    text-align: left;
+    margin-bottom: 2rem;
+    border-top: 1px solid rgba(0,212,255,.15);
+    padding-top: 1.2rem;
+}
+.info-item label { font-size: .72rem; color: var(--muted); display: block; text-transform: uppercase; letter-spacing: .5px; }
+.info-item span  { font-size: .92rem; font-weight: 600; color: #c8e6f5; }
 .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-.btn-edit { display: inline-block; padding: .65rem 2rem; background: var(--purple); color: #fff; border: none; border-radius: 8px; font-size: .9rem; font-family: inherit; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s, transform .15s; box-shadow: 0 4px 12px rgba(75,40,130,.28); }
-.btn-edit:hover { background: var(--purple-dk); transform: translateY(-1px); }
-.btn-logout { display: inline-block; padding: .65rem 2rem; background: var(--danger); color: #fff; border: none; border-radius: 8px; font-size: .9rem; font-family: inherit; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .2s, transform .15s; box-shadow: 0 4px 12px rgba(192,57,43,.28); }
-.btn-logout:hover { background: #a93226; transform: translateY(-1px); }
-@media (max-width: 500px) { .info-grid { grid-template-columns: 1fr; } .dash-card { padding: 2rem 1.4rem; } }
+.btn-edit {
+    display: inline-block;
+    padding: .65rem 2rem;
+    background: transparent;
+    color: var(--neon);
+    border: 1px solid var(--neon);
+    border-radius: 8px;
+    font-size: .9rem;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+}
+.btn-edit:hover { background: rgba(0,212,255,.1); box-shadow: 0 0 20px rgba(0,212,255,.3); color: #fff; }
+.btn-logout {
+    display: inline-block;
+    padding: .65rem 2rem;
+    background: transparent;
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+    border-radius: 8px;
+    font-size: .9rem;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+}
+.btn-logout:hover { background: rgba(255,107,107,.1); box-shadow: 0 0 20px rgba(255,107,107,.2); }
+@media (max-width: 500px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .dash-card { padding: 2rem 1.4rem; }
+}
 </style>
 </head>
 <body>
 <nav>
     <span class="brand">College of Computer Studies Sit-in Monitoring System</span>
     <ul>
-        <li><a href="dashboard.php">Dashboard</a></li>
+        <li><a href="dashboard.php" class="active">Dashboard</a></li>
         <li><a href="edit_profile.php">Edit Profile</a></li>
         <li><a href="logout.php">Logout</a></li>
     </ul>
@@ -64,9 +183,9 @@ h2 { font-size: 1.4rem; font-weight: 600; color: var(--purple); margin-bottom: .
 <main>
     <div class="dash-card">
         <div class="avatar">
-            <svg viewBox="0 0 60 60" width="48" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="30" cy="22" r="12" fill="#fff"/>
-                <ellipse cx="30" cy="50" rx="18" ry="10" fill="#fff"/>
+            <svg viewBox="0 0 60 60" width="40" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="22" r="12" fill="#00d4ff" opacity=".7"/>
+                <ellipse cx="30" cy="50" rx="18" ry="10" fill="#00d4ff" opacity=".5"/>
             </svg>
         </div>
         <h2>Welcome, <?= htmlspecialchars($user['first_name']) ?>!</h2>
