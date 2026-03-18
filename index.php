@@ -1,5 +1,7 @@
 <?php
 session_start();
+require 'db.php';
+
 if (isset($_SESSION['user'])) {
     header('Location: dashboard.php');
     exit;
@@ -14,20 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($id_number) || empty($password)) {
         $error = 'Please fill in all fields.';
     } else {
-        $users = [];
-        if (file_exists('users.json')) {
-            $users = json_decode(file_get_contents('users.json'), true) ?? [];
-        }
-        $found = false;
-        foreach ($users as $user) {
-            if ($user['id_number'] === $id_number && password_verify($password, $user['password'])) {
-                $_SESSION['user'] = $user;
-                $found = true;
-                header('Location: dashboard.php');
-                exit;
-            }
-        }
-        if (!$found) {
+        $stmt = $pdo->prepare("SELECT * FROM students WHERE id_number = ?");
+        $stmt->execute([$id_number]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user'] = $user;
+            header('Location: dashboard.php');
+            exit;
+        } else {
             $error = 'Invalid ID number or password.';
         }
     }
@@ -157,54 +154,38 @@ h2 { font-size: 1.3rem; font-weight: 600; color: var(--purple); text-align: cent
 </style>
 </head>
 <body>
-
 <nav>
     <span class="brand">College of Computer Studies Sit-in Monitoring System</span>
     <ul>
-        <li><a href="index.php">Home</a></li>
+        <li><a href="index.php" class="active">Home</a></li>
         <li><a href="#">Community ▾</a></li>
         <li><a href="#">About</a></li>
-        <li><a href="index.php" class="active">Login</a></li>
+        <li><a href="index.php">Login</a></li>
         <li><a href="register.php">Register</a></li>
     </ul>
 </nav>
-
 <main>
     <div class="login-card">
-
         <div class="logo-side">
             <svg viewBox="0 0 180 200" width="170" xmlns="http://www.w3.org/2000/svg">
-                <path d="M90 8 L168 40 L168 110 Q168 165 90 192 Q12 165 12 110 L12 40 Z"
-                      fill="#4B2882" stroke="#D4A017" stroke-width="4"/>
-                <path d="M90 18 L158 46 L158 112 Q158 158 90 182 Q22 158 22 112 L22 46 Z"
-                      fill="#D4A017"/>
-                <path d="M90 28 L148 52 L148 114 Q148 152 90 172 Q32 152 32 114 L32 52 Z"
-                      fill="#4B2882"/>
-                <text x="90" y="80"  font-size="11" font-weight="700" fill="#D4A017"
-                      text-anchor="middle" font-family="sans-serif">UC</text>
-                <text x="90" y="95"  font-size="9" fill="#D4A017"
-                      text-anchor="middle" font-family="sans-serif">COLLEGE OF</text>
-                <text x="90" y="128" font-size="34" font-weight="900" fill="#D4A017"
-                      text-anchor="middle" font-family="sans-serif">CCS</text>
-                <text x="90" y="148" font-size="7.5" fill="#D4A017"
-                      text-anchor="middle" font-family="sans-serif">COMPUTER STUDIES</text>
-                <text x="90" y="160" font-size="6" fill="#fff"
-                      text-anchor="middle" font-family="sans-serif" font-style="italic">INCEPTUM . INNOVATIO . MUNERIS</text>
+                <path d="M90 8 L168 40 L168 110 Q168 165 90 192 Q12 165 12 110 L12 40 Z" fill="#4B2882" stroke="#D4A017" stroke-width="4"/>
+                <path d="M90 18 L158 46 L158 112 Q158 158 90 182 Q22 158 22 112 L22 46 Z" fill="#D4A017"/>
+                <path d="M90 28 L148 52 L148 114 Q148 152 90 172 Q32 152 32 114 L32 52 Z" fill="#4B2882"/>
+                <text x="90" y="80"  font-size="11" font-weight="700" fill="#D4A017" text-anchor="middle" font-family="sans-serif">UC</text>
+                <text x="90" y="95"  font-size="9" fill="#D4A017" text-anchor="middle" font-family="sans-serif">COLLEGE OF</text>
+                <text x="90" y="128" font-size="34" font-weight="900" fill="#D4A017" text-anchor="middle" font-family="sans-serif">CCS</text>
+                <text x="90" y="148" font-size="7.5" fill="#D4A017" text-anchor="middle" font-family="sans-serif">COMPUTER STUDIES</text>
+                <text x="90" y="160" font-size="6" fill="#fff" text-anchor="middle" font-family="sans-serif" font-style="italic">INCEPTUM . INNOVATIO . MUNERIS</text>
                 <rect x="55" y="165" width="70" height="16" rx="3" fill="#D4A017"/>
-                <text x="90" y="176" font-size="9" font-weight="700" fill="#4B2882"
-                      text-anchor="middle" font-family="sans-serif">1983</text>
+                <text x="90" y="176" font-size="9" font-weight="700" fill="#4B2882" text-anchor="middle" font-family="sans-serif">1983</text>
             </svg>
         </div>
-
         <div class="vdiv"></div>
-
         <div class="form-col">
             <h2>Sign In</h2>
-
             <?php if ($error): ?>
                 <div class="alert alert-err"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
-
             <form method="POST" action="index.php">
                 <div class="field">
                     <input type="text" name="id_number"
@@ -223,12 +204,9 @@ h2 { font-size: 1.3rem; font-weight: 600; color: var(--purple); text-align: cent
                 </div>
                 <button type="submit" class="btn-login">Login</button>
             </form>
-
             <p class="reg-link">Don't have an account? <a href="register.php">Register</a></p>
         </div>
-
     </div>
 </main>
-
 </body>
 </html>
