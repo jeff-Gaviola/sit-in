@@ -11,15 +11,16 @@ $error   = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $last_name    = trim($_POST['last_name']    ?? '');
-    $first_name   = trim($_POST['first_name']   ?? '');
-    $middle_name  = trim($_POST['middle_name']  ?? '');
-    $course       = trim($_POST['course']       ?? '');
-    $course_level = trim($_POST['course_level'] ?? '1');
-    $email        = trim($_POST['email']        ?? '');
-    $address      = trim($_POST['address']      ?? '');
-    $new_password = $_POST['new_password']      ?? '';
-    $confirm_pw   = $_POST['confirm_password']  ?? '';
+    $last_name      = trim($_POST['last_name']      ?? '');
+    $first_name     = trim($_POST['first_name']     ?? '');
+    $middle_name    = trim($_POST['middle_name']    ?? '');
+    $course         = trim($_POST['course']         ?? '');
+    $course_level   = trim($_POST['course_level']   ?? '1');
+    $email          = trim($_POST['email']          ?? '');
+    $address        = trim($_POST['address']        ?? '');
+    $contact_number = trim($_POST['contact_number'] ?? '');
+    $new_password   = $_POST['new_password']        ?? '';
+    $confirm_pw     = $_POST['confirm_password']    ?? '';
 
     if (empty($last_name) || empty($first_name) || empty($email) || empty($course)) {
         $error = 'Please fill in all required fields.';
@@ -36,11 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'That email is already used by another account.';
         } else {
             if (!empty($new_password)) {
-                $stmt = $pdo->prepare("UPDATE students SET last_name=?, first_name=?, middle_name=?, course=?, course_level=?, email=?, address=?, password=? WHERE id=?");
-                $stmt->execute([$last_name, $first_name, $middle_name, $course, $course_level, $email, $address, password_hash($new_password, PASSWORD_DEFAULT), $user['id']]);
+                $stmt = $pdo->prepare("UPDATE students SET last_name=?, first_name=?, middle_name=?, course=?, course_level=?, email=?, address=?, contact_number=?, password=? WHERE id=?");
+                $stmt->execute([$last_name, $first_name, $middle_name, $course, $course_level, $email, $address, $contact_number, password_hash($new_password, PASSWORD_DEFAULT), $user['id']]);
             } else {
-                $stmt = $pdo->prepare("UPDATE students SET last_name=?, first_name=?, middle_name=?, course=?, course_level=?, email=?, address=? WHERE id=?");
-                $stmt->execute([$last_name, $first_name, $middle_name, $course, $course_level, $email, $address, $user['id']]);
+                $stmt = $pdo->prepare("UPDATE students SET last_name=?, first_name=?, middle_name=?, course=?, course_level=?, email=?, address=?, contact_number=? WHERE id=?");
+                $stmt->execute([$last_name, $first_name, $middle_name, $course, $course_level, $email, $address, $contact_number, $user['id']]);
             }
             $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
             $stmt->execute([$user['id']]);
@@ -258,6 +259,7 @@ h2 {
 
         <form method="POST" action="edit_profile.php">
             <div class="section-label">Personal Information</div>
+
             <div class="field">
                 <input type="text" value="<?= htmlspecialchars($user['id_number']) ?>" disabled>
                 <label>ID Number (cannot be changed)</label>
@@ -310,6 +312,11 @@ h2 {
                 <input type="text" name="address" placeholder="Home address"
                        value="<?= htmlspecialchars($_POST['address'] ?? $user['address']) ?>">
                 <label>Address</label>
+            </div>
+            <div class="field">
+                <input type="text" name="contact_number" placeholder="e.g. 09123456789"
+                       value="<?= htmlspecialchars($_POST['contact_number'] ?? $user['contact_number']) ?>">
+                <label>Contact Number</label>
             </div>
 
             <div class="section-label">Change Password <span style="font-weight:400;opacity:.6">(leave blank to keep current)</span></div>

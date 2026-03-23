@@ -101,17 +101,46 @@ main {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+.avatar-wrapper {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    cursor: pointer;
+}
 .avatar {
-    width: 70px; height: 70px;
+    width: 90px; height: 90px;
     background: rgba(0,212,255,.1);
     border: 2px solid rgba(0,212,255,.4);
     border-radius: 50%;
-    margin: 0 auto 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 20px rgba(0,212,255,.2);
+    overflow: hidden;
 }
+.avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.avatar-overlay {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 28px; height: 28px;
+    background: var(--neon);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    color: var(--dark);
+    font-weight: 700;
+    border: 2px solid var(--dark);
+    cursor: pointer;
+    transition: transform .2s;
+}
+.avatar-overlay:hover { transform: scale(1.1); }
+#photo-input { display: none; }
 h2 {
     font-size: 1.4rem;
     font-weight: 600;
@@ -182,14 +211,33 @@ h2 {
 </nav>
 <main>
     <div class="dash-card">
-        <div class="avatar">
-            <svg viewBox="0 0 60 60" width="40" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="30" cy="22" r="12" fill="#00d4ff" opacity=".7"/>
-                <ellipse cx="30" cy="50" rx="18" ry="10" fill="#00d4ff" opacity=".5"/>
-            </svg>
+
+        <!-- PHOTO UPLOAD -->
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; margin-bottom:1rem;">
+            <form action="upload_photo.php" method="POST" enctype="multipart/form-data" id="photo-form" style="display:flex; justify-content:center;">
+                <div class="avatar-wrapper" onclick="document.getElementById('photo-input').click()">
+                <div class="avatar" id="avatar-circle">
+                    <?php if (!empty($user['photo'])): ?>
+                     <img src="uploads/<?= htmlspecialchars($user['photo']) ?>" id="avatar-img">
+                     <?php else: ?>
+                         <svg viewBox="0 0 60 60" width="40" xmlns="http://www.w3.org/2000/svg" id="avatar-svg">
+            <circle cx="30" cy="22" r="12" fill="#00d4ff" opacity=".7"/>
+            <ellipse cx="30" cy="50" rx="18" ry="10" fill="#00d4ff" opacity=".5"/>
+                        </svg>
+                     <?php endif; ?>
+                    </div>
+                    <div class="avatar-overlay" title="Upload photo">+</div>
+                </div>
+                <input type="file" name="photo" id="photo-input" accept="image/*"
+                       onchange="previewAndUpload(this)">
+            </form>
         </div>
+
+        <!-- WELCOME -->
         <h2>Welcome, <?= htmlspecialchars($user['first_name']) ?>!</h2>
         <p class="sub">You are successfully logged in to the CCS Sit-in Monitoring System.</p>
+
+        <!-- INFO GRID -->
         <div class="info-grid">
             <div class="info-item">
                 <label>ID Number</label>
@@ -215,12 +263,41 @@ h2 {
                 <label>Address</label>
                 <span><?= htmlspecialchars($user['address'] ?: '—') ?></span>
             </div>
+            <div class="info-item">
+                <label>Contact Number</label>
+                <span><?= htmlspecialchars($user['contact_number'] ?: '—') ?></span>
+            </div>
         </div>
+
+        <!-- BUTTONS -->
         <div class="btn-group">
             <a href="edit_profile.php" class="btn-edit">Edit Profile</a>
             <a href="logout.php" class="btn-logout">Logout</a>
         </div>
+
     </div>
 </main>
+
+<script>
+function previewAndUpload(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var circle = document.getElementById('avatar-circle');
+            var svg = document.getElementById('avatar-svg');
+            var existing = document.getElementById('avatar-img');
+            if (svg) svg.remove();
+            if (existing) existing.remove();
+            var img = document.createElement('img');
+            img.src = e.target.result;
+            img.id = 'avatar-img';
+            circle.appendChild(img);
+        };
+        reader.readAsDataURL(input.files[0]);
+        document.getElementById('photo-form').submit();
+    }
+}
+</script>
+
 </body>
 </html>

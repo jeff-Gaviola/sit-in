@@ -32,15 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->fetch()) {
             $error = 'ID Number or Email is already registered.';
         } else {
+            $contact_number = trim($_POST['contact_number'] ?? '');
+
             $stmt = $pdo->prepare("INSERT INTO students
-                (id_number, last_name, first_name, middle_name, course, course_level, password, email, address)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            (id_number, last_name, first_name, middle_name, course, course_level, password, email, address, contact_number)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
-                $id_number, $last_name, $first_name, $middle_name,
-                $course, $course_level,
-                password_hash($password, PASSWORD_DEFAULT),
-                $email, $address
-            ]);
+            $id_number, $last_name, $first_name, $middle_name,
+            $course, $course_level,
+            password_hash($password, PASSWORD_DEFAULT),
+            $email, $address, $contact_number
+]);
             $success = 'Registration successful! You can now log in.';
             $_POST   = [];
         }
@@ -361,9 +363,14 @@ h2 {
                     <label>Email *</label>
                 </div>
                 <div class="field">
-                    <input type="text" name="address" placeholder="Home address"
-                           value="<?= htmlspecialchars($_POST['address'] ?? '') ?>">
-                    <label>Address</label>
+                     <input type="text" name="address" placeholder="Home address"
+                            value="<?= htmlspecialchars($_POST['address'] ?? '') ?>">
+                     <label>Address</label>
+         </div>
+                <div class="field">
+    <input type="text" name="contact_number" placeholder="e.g. 09123456789"
+           value="<?= htmlspecialchars($_POST['contact_number'] ?? '') ?>">
+    <label>Contact Number</label>
                 </div>
                 <button type="submit" class="btn-register">Register</button>
             </form>
